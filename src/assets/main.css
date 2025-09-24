@@ -1,3 +1,85 @@
 /* CSS Secundario */
 @import './base.css';
 
+body {
+  background: linear-gradient(270deg, #252341, #322e55, #222b7a, #1b3281);
+  background-size: 800% 800%;
+  animation: gradientAnimation 40s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.search-input {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.square-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Estilos para el modo oscuro */
+body.dark-mode {
+  background: #2c2c2c;
+  color: #ffffff;
+}
+
+body.dark-mode .bg-primary {
+  background-color: #0d6efd !important;
+}
+
+body.dark-mode .bg-warning {
+  background-color: #ffc107 !important;
+}
+
+body.dark-mode .text-white {
+  color: #ffffff !important;
+}
+
+body.dark-mode .btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+body.dark-mode .btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
+body.dark-mode .btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+body.dark-mode .modal-content {
+  background-color: #333;
+  color: #fff;
+}
+
+body.dark-mode .modal-header {
+  border-bottom: 1px solid #444;
+}
+
+body.dark-mode .modal-footer {
+  border-top: 1px solid #444;
+}
+
+body.dark-mode .btn-close {
+  filter: invert(1);
+}
+
