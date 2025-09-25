@@ -37,7 +37,7 @@
               <select class="form-select" id="categoria" v-model="formulario.categoria" required>
                 <option value="">Seleccione una categoría</option>
                 <option 
-                  v-for="categoria in categorias" 
+                  v-for="categoria in datosStore.categorias" 
                   :key="categoria.categoria" 
                   :value="categoria.categoria"
                 >
@@ -57,7 +57,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
+import { useDatosStore } from '@/stores/datos'
+
+const datosStore = useDatosStore()
 
 const formulario = ref({
   nombre: '',
@@ -65,29 +68,13 @@ const formulario = ref({
   categoria: ''
 })
 
-const categorias = ref([])
-
-const cargarCategorias = async () => {
-  try {
-    const response = await fetch('/datos.json')
-    const data = await response.json()
-    categorias.value = data
-  } catch (error) {
-    console.error('Error al cargar las categorías:', error)
-  }
-}
-
 const guardarPagina = () => {
-  // Aquí irá la lógica para guardar la página
-  console.log('Datos del formulario:', formulario.value)
+  // Agregar la nueva página usando el store
+  datosStore.agregarPagina(formulario.value)
   
   // Limpiar el formulario después de guardar
   formulario.value.nombre = ''
   formulario.value.url = ''
   formulario.value.categoria = ''
 }
-
-onMounted(() => {
-  cargarCategorias()
-})
 </script>
