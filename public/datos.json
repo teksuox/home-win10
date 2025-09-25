@@ -1,0 +1,76 @@
+[
+  {
+    "categoria": "Buscadores",
+    "paginas": [
+      {
+        "id": 1,
+        "nombre": "Google",
+        "url": "https://www.google.com",
+        "icono": "https://www.google.com/favicon.ico"
+      },
+      {
+        "id": 2,
+        "nombre": "Bing",
+        "url": "https://www.bing.com",
+        "icono": "https://www.bing.com/favicon.ico"
+      },
+      {
+        "id": 3,
+        "nombre": "DuckDuckGo",
+        "url": "https://www.duckduckgo.com",
+        "icono": "https://duckduckgo.com/favicon.ico"
+      }
+    ]
+  },
+  {
+    "categoria": "Redes Sociales",
+    "paginas": [
+      {
+        "id": 4,
+        "nombre": "Facebook",
+        "url": "https://www.facebook.com",
+        "icono": "https://www.facebook.com/favicon.ico"
+      },
+      {
+        "id": 5,
+        "nombre": "Twitter",
+        "url": "https://www.twitter.com",
+        "icono": "https://www.twitter.com/favicon.ico"
+      }
+    ]
+  },
+  {
+    "categoria": "Noticias",
+    "paginas": [
+      {
+        "id": 6,
+        "nombre": "BBC News",
+        "url": "https://www.bbc.com/news",
+        "icono": "https://www.bbc.com/favicon.ico"
+      },
+      {
+        "id": 7,
+        "nombre": "CNN",
+        "url": "https://www.cnn.com",
+        "icono": "https://www.cnn.com/favicon.ico"
+      }
+    ]
+  },
+  {
+    "categoria": "Educación",
+    "paginas": [
+      {
+        "id": 8,
+        "nombre": "Khan Academy",
+        "url": "https://www.khanacademy.org",
+        "icono": "https://www.khanacademy.org/favicon.ico"
+      },
+      {
+        "id": 9,
+        "nombre": "Coursera",
+        "url": "https://www.coursera.org",
+        "icono": "https://www.coursera.org/favicon.ico"
+      }
+    ]
+  }
+]

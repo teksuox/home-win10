@@ -11,21 +11,26 @@
       </div>
     </div>
     <div class="col text-center d-flex align-items-center justify-content-center">
-      <div class="input-group search-input">
-        <input type="text" class="form-control form-control-sm" placeholder="Buscar...">
-        <button class="btn btn-outline-secondary" type="button">
-          <i class="bi bi-search"></i>
-        </button>
-      </div>
+      <form class="w-100">
+        <div class="input-group search-input">
+          <input type="text" class="form-control form-control-sm" placeholder="Buscar..." style="outline: none; box-shadow: none;">
+          <button class="btn btn-secondary btn-outline-secondary" type="submit">
+            <i class="bi bi-search text-white"></i>
+          </button>
+        </div>
+      </form>
     </div>
     <div class="col-auto  p-2 d-flex align-items-center gap-2">
-      <button class="btn btn-primary square-btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      <button class="btn btn-primary rounded-circle square-btn" data-bs-toggle="modal" data-bs-target="#Modal_Configuracion">
         <i class="bi bi-gear"></i>
       </button>
-      <button class="btn btn-warning square-btn" @click="toggleDarkMode">
+      <button class="btn btn-light rounded-circle square-btn" data-bs-toggle="modal" data-bs-target="#Modal_Formulario">
+        <i class="bi bi-plus-lg"></i>
+      </button>
+      <button class="btn btn-warning rounded-circle square-btn" @click="toggleDarkMode">
         <i class="bi" :class="darkMode ? 'bi-sun' : 'bi-moon'"></i>
       </button>
-      <button class="btn btn-danger square-btn">
+      <button class="btn btn-danger rounded-circle square-btn">
         <i class="bi bi-box-arrow-right"></i>
       </button>
     </div>
