@@ -1,0 +1,18 @@
+FROM node:24.8.0-alpine
+
+WORKDIR /app
+
+# Copiar package.json y package-lock.json del backend
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar el resto del código del backend
+COPY . .
+
+# Exponer puerto
+EXPOSE 3000
+
+# Comando para correr la aplicación
+CMD ["node", "server.js"]

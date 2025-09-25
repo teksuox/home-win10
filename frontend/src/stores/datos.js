@@ -5,57 +5,127 @@ export const useDatosStore = defineStore('datos', () => {
   const datos = ref([])
   const columnasSeleccionadas = ref(3)
   
-  // Cargar datos desde el archivo JSON
+  // Cargar datos desde el backend
   const cargarDatos = async () => {
     try {
-      // Verificar si hay datos guardados en localStorage
-      const datosGuardados = localStorage.getItem('ordenPaginas')
-      if (datosGuardados) {
-        datos.value = JSON.parse(datosGuardados)
-      } else {
-        // Si no hay datos guardados, cargar desde el archivo JSON
-        const response = await fetch('/datos.json')
+      // Primero intentar cargar desde el backend
+      const response = await fetch('http://localhost:3000/api/datos')
+      if (response.ok) {
         const data = await response.json()
         datos.value = data
+      } else {
+        // Si no hay datos en el backend, cargar desde el archivo JSON local
+        const localResponse = await fetch('/datos.json')
+        const localData = await localResponse.json()
+        datos.value = localData
+        
+        // Guardar los datos locales en el backend para futuras sesiones
+        await guardarOrden()
       }
     } catch (error) {
       console.error('Error al cargar los datos:', error)
+      // Fallback a datos locales si hay error de conexión
+      try {
+        const localResponse = await fetch('/datos.json')
+        const localData = await localResponse.json()
+        datos.value = localData
+      } catch (localError) {
+        console.error('Error al cargar datos locales:', localError)
+      }
     }
   }
   
-  // Guardar el orden de las páginas en localStorage
-  const guardarOrden = () => {
-    localStorage.setItem('ordenPaginas', JSON.stringify(datos.value))
+  // Guardar el orden de las páginas en el backend
+  const guardarOrden = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/datos/orden', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ datos: datos.value })
+      })
+      
+      if (!response.ok) {
+        throw new Error('Error al guardar el orden')
+      }
+      
+      const result = await response.json()
+      console.log('Orden guardado:', result.message)
+    } catch (error) {
+      console.error('Error al guardar el orden:', error)
+    }
   }
   
   // Guardar configuración de columnas
-  const guardarConfiguracionColumnas = (columnas) => {
-    columnasSeleccionadas.value = columnas
-    localStorage.setItem('configuracionColumnas', columnas)
+  const guardarConfiguracionColumnas = async (columnas) => {
+    try {
+      columnasSeleccionadas.value = columnas
+      const response = await fetch('http://localhost:3000/api/configuracion/columnas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ columnas })
+      })
+      
+      if (!response.ok) {
+        throw new Error('Error al guardar configuración')
+      }
+      
+      const result = await response.json()
+      console.log('Configuración guardada:', result.message)
+    } catch (error) {
+      console.error('Error al guardar configuración:', error)
+    }
   }
   
   // Cargar configuración de columnas
-  const cargarConfiguracionColumnas = () => {
-    const configuracionGuardada = localStorage.getItem('configuracionColumnas')
-    if (configuracionGuardada) {
-      columnasSeleccionadas.value = parseInt(configuracionGuardada)
+  const cargarConfiguracionColumnas = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/configuracion/columnas')
+      if (response.ok) {
+        const data = await response.json()
+        columnasSeleccionadas.value = data.columnas
+      }
+      return columnasSeleccionadas.value
+    } catch (error) {
+      console.error('Error al cargar configuración:', error)
+      return columnasSeleccionadas.value
     }
-    return columnasSeleccionadas.value
   }
   
   // Agregar una nueva página
-  const agregarPagina = (nuevaPagina) => {
-    const categoria = datos.value.find(cat => cat.categoria === nuevaPagina.categoria)
-    if (categoria) {
-      // Generar un ID único para la nueva página
-      const nuevoId = Date.now() // Usar timestamp como ID único
-      categoria.paginas.push({
-        id: nuevoId,
-        nombre: nuevaPagina.nombre,
-        url: nuevaPagina.url,
-        icono: `https://www.google.com/s2/favicons?domain=${new URL(nuevaPagina.url).hostname}`
+  const agregarPagina = async (nuevaPagina) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/datos/pagina', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          categoria: nuevaPagina.categoria,
+          pagina: {
+            id: Date.now(),
+            nombre: nuevaPagina.nombre,
+            url: nuevaPagina.url,
+            icono: `https://www.google.com/s2/favicons?domain=${new URL(nuevaPagina.url).hostname}`,
+            categoria: nuevaPagina.categoria
+          }
+        })
       })
-      guardarOrden()
+      
+      if (!response.ok) {
+        throw new Error('Error al agregar página')
+      }
+      
+      const result = await response.json()
+      console.log('Página agregada:', result.message)
+      
+      // Recargar los datos para reflejar los cambios
+      await cargarDatos()
+    } catch (error) {
+      console.error('Error al agregar página:', error)
     }
   }
   

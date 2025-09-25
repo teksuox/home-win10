@@ -2,8 +2,49 @@ version: "3.9"
 
 services:
   frontend:
-    build: .
+    build:
+      context: ./frontend
+      dockerfile: ../Dockerfile.frontend
     container_name: vue3_frontend
     ports:
       - "90:80"
     restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../Dockerfile.backend
+    container_name: node_backend
+    ports:
+      - "3000:3000"
+    environment:
+      MONGODB_URI: mongodb://root:example@mongodb:27017/?authSource=admin
+      NODE_ENV: production
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge
