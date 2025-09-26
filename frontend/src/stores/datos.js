@@ -5,30 +5,51 @@ export const useDatosStore = defineStore('datos', () => {
   const datos = ref([])
   const columnasSeleccionadas = ref(3)
   
+  // Guardar datos en localStorage
+  const guardarEnLocalStorage = (data) => {
+    try {
+      localStorage.setItem('datosHome', JSON.stringify(data))
+    } catch (error) {
+      console.error('Error al guardar en localStorage:', error)
+    }
+  }
+  
+  // Cargar datos desde localStorage
+  const cargarDesdeLocalStorage = () => {
+    try {
+      const data = localStorage.getItem('datosHome')
+      return data ? JSON.parse(data) : []
+    } catch (error) {
+      console.error('Error al cargar desde localStorage:', error)
+      return []
+    }
+  }
+  
   // Cargar datos desde el backend
   const cargarDatos = async () => {
     try {
-      // Primero intentar cargar desde el backend
+      // Primero cargar desde localStorage si existen datos
+      const localData = cargarDesdeLocalStorage()
+      if (localData.length > 0) {
+        datos.value = localData
+      }
+      
+      // Luego intentar cargar desde el backend
       const response = await fetch('http://localhost:3000/api/datos')
       if (response.ok) {
         const data = await response.json()
         datos.value = data
-      } else {
-        // Si no hay datos en el backend, cargar desde el archivo JSON local
-        const localResponse = await fetch('/datos.json')
-        const localData = await localResponse.json()
-        datos.value = localData
-        
-        // Guardar los datos locales en el backend para futuras sesiones
-        await guardarOrden()
-      }
+        // Guardar en localStorage después de obtener datos del backend
+        guardarEnLocalStorage(data)
+      } 
     } catch (error) {
       console.error('Error al cargar los datos:', error)
       // Fallback a datos locales si hay error de conexión
       try {
-        const localResponse = await fetch('/datos.json')
-        const localData = await localResponse.json()
-        datos.value = localData
+        const localData = cargarDesdeLocalStorage()
+        if (localData.length > 0) {
+          datos.value = localData
+        }
       } catch (localError) {
         console.error('Error al cargar datos locales:', localError)
       }
@@ -52,8 +73,12 @@ export const useDatosStore = defineStore('datos', () => {
       
       const result = await response.json()
       console.log('Orden guardado:', result.message)
+      // Guardar en localStorage después de guardar en backend
+      guardarEnLocalStorage(datos.value)
     } catch (error) {
       console.error('Error al guardar el orden:', error)
+      // Guardar en localStorage incluso si falla el backend
+      guardarEnLocalStorage(datos.value)
     }
   }
   
@@ -109,7 +134,7 @@ export const useDatosStore = defineStore('datos', () => {
             id: Date.now(),
             nombre: nuevaPagina.nombre,
             url: nuevaPagina.url,
-            icono: `https://www.google.com/s2/favicons?domain=${new URL(nuevaPagina.url).hostname}`,
+            icono: `https://www.google.com/s2/favicons?domain=${new URL(nuevaPagina.url).hostname}&sz=64`,
             categoria: nuevaPagina.categoria
           }
         })
@@ -126,6 +151,8 @@ export const useDatosStore = defineStore('datos', () => {
       await cargarDatos()
     } catch (error) {
       console.error('Error al agregar página:', error)
+      // Guardar datos actuales en localStorage incluso si falla el backend
+      guardarEnLocalStorage(datos.value)
     }
   }
   

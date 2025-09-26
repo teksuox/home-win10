@@ -21,8 +21,14 @@ router.post('/api/datos/orden', async (req, res) => {
     // Eliminar todos los datos existentes
     await Categoria.deleteMany({});
     
-    // Insertar los nuevos datos
-    await Categoria.insertMany(datos);
+    // Insertar solo las categorías que tienen páginas
+    const datosConPaginas = datos.filter(categoria => 
+      categoria.paginas && categoria.paginas.length > 0
+    );
+    
+    if (datosConPaginas.length > 0) {
+      await Categoria.insertMany(datosConPaginas);
+    }
     
     res.json({ message: 'Orden guardado correctamente' });
   } catch (error) {
@@ -56,6 +62,46 @@ router.post('/api/datos/pagina', async (req, res) => {
   } catch (error) {
     console.error('Error al agregar página:', error);
     res.status(500).json({ message: 'Error al agregar página' });
+  }
+});
+
+// Eliminar una página
+router.delete('/api/datos/pagina/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Buscar todas las categorías
+    const categorias = await Categoria.find({});
+    let paginaEliminada = false;
+    
+    // Buscar la página en todas las categorías
+    for (const categoria of categorias) {
+      const paginaIndex = categoria.paginas.findIndex(p => p.id == id);
+      
+      if (paginaIndex !== -1) {
+        // Eliminar la página de la categoría
+        categoria.paginas.splice(paginaIndex, 1);
+        
+        // Si la categoría queda sin páginas, eliminarla
+        if (categoria.paginas.length === 0) {
+          await Categoria.deleteOne({ _id: categoria._id });
+        } else {
+          await categoria.save();
+        }
+        
+        paginaEliminada = true;
+        break;
+      }
+    }
+    
+    if (paginaEliminada) {
+      res.json({ message: 'Página eliminada correctamente' });
+    } else {
+      res.status(404).json({ message: 'Página no encontrada' });
+    }
+  } catch (error) {
+    console.error('Error al eliminar página:', error);
+    res.status(500).json({ message: 'Error al eliminar página' });
   }
 });
 

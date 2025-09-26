@@ -14,7 +14,7 @@
           <template #item="{ element: categoria }">
             <div :class="datosStore.columnaClase">
               <h5 class="text-white drag-handle" style="cursor: move;">
-                <i class="bi bi-grip-vertical me-2"></i>
+                <i class="bi bi-grip-vertical me-2" style="cursor: pointer;"></i>
                 {{ categoria.categoria }}
               </h5>
               <draggable 
@@ -35,7 +35,7 @@
                           <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-sm">
-                          <li><a class="dropdown-item small" href="#" @click.prevent="editarPagina(element)"><i class="bi bi-pencil"></i> Editar</a></li>
+                          <li><a class="dropdown-item small" href="#" @click.prevent="editarPagina(element)" data-bs-toggle="modal" data-bs-target="#Modal_Formulario"><i class="bi bi-pencil"></i> Editar</a></li>
                           <li><a class="dropdown-item small" href="#" @click.prevent="eliminarPagina(categoria, element)"><i class="bi bi-trash"></i> Eliminar</a></li>
                         </ul>
                       </div>

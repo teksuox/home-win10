@@ -32,9 +32,14 @@
               >
             </div>
             
-            <div class="mb-3">
+            <div class="mb-3" v-show="!crearNuevaCategoria">
               <label for="categoria" class="form-label">Categoría</label>
-              <select class="form-select" id="categoria" v-model="formulario.categoria" required>
+              <select 
+                class="form-select" 
+                id="categoria" 
+                v-model="formulario.categoria" 
+                required
+              >
                 <option value="">Seleccione una categoría</option>
                 <option 
                   v-for="categoria in datosStore.categorias" 
@@ -44,6 +49,30 @@
                   {{ categoria.categoria }}
                 </option>
               </select>
+            </div>
+                        
+            <div class="mb-3" v-if="crearNuevaCategoria">
+              <label for="nuevaCategoria" class="form-label">Nueva categoría</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nuevaCategoria" 
+                v-model="nuevaCategoriaNombre"
+                placeholder="Nombre de la nueva categoría"
+                required
+              >
+            </div>
+            
+            <div class="mb-3 form-check">
+              <input 
+                type="checkbox" 
+                class="form-check-input" 
+                id="nuevaCategoriaCheck"
+                v-model="crearNuevaCategoria"
+              >
+              <label class="form-check-label" for="nuevaCategoriaCheck">
+                Crear nueva categoría
+              </label>
             </div>
           </form>
         </div>
@@ -57,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useDatosStore } from '@/stores/datos'
 
 const datosStore = useDatosStore()
@@ -68,13 +97,33 @@ const formulario = ref({
   categoria: ''
 })
 
+const crearNuevaCategoria = ref(false)
+const nuevaCategoriaNombre = ref('')
+
+const categoriasDisponibles = computed(() => {
+  return datosStore.categorias.map(cat => cat.categoria)
+})
+
 const guardarPagina = () => {
+  let categoriaFinal = formulario.value.categoria
+  
+  if (crearNuevaCategoria.value && nuevaCategoriaNombre.value.trim()) {
+    categoriaFinal = nuevaCategoriaNombre.value.trim()
+  }
+  
+  const paginaParaGuardar = {
+    ...formulario.value,
+    categoria: categoriaFinal
+  }
+  
   // Agregar la nueva página usando el store
-  datosStore.agregarPagina(formulario.value)
+  datosStore.agregarPagina(paginaParaGuardar)
   
   // Limpiar el formulario después de guardar
   formulario.value.nombre = ''
   formulario.value.url = ''
   formulario.value.categoria = ''
+  crearNuevaCategoria.value = false
+  nuevaCategoriaNombre.value = ''
 }
 </script>
