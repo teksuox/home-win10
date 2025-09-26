@@ -35,10 +35,16 @@
       </button>
     </div>
   </div>
+  <ModalConfiguracion />
+  <ModalFormulario />
+  <ModalPrueba />
 </template>
 
 <script setup>
 import { ref, onMounted, watch, provide } from 'vue'
+import ModalConfiguracion from '@/components/Modal_Configuracion.vue'
+import ModalFormulario from '@/components/Modal_Formulario.vue'
+import ModalPrueba from '@/components/Modal_Prueba.vue'
 
 const darkMode = ref(false)
 
@@ -72,4 +78,5 @@ onMounted(() => {
 watch(darkMode, (newVal) => {
   localStorage.setItem('darkMode', newVal.toString())
 })
+
 </script>
