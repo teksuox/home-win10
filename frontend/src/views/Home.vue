@@ -69,9 +69,9 @@ const abrirPagina = (url) => {
 
 // Función para editar una página
 const editarPagina = (pagina) => {
-  // Limpiar datos anteriores y agregar el nuevo dato
-  datosModal.limpiarDatos()
+  // agregar el nuevo dato
   datosModal.agregarDato(pagina)
+  datosModal.EditarDatosFormulario(true)
 }
 
 // Función para eliminar una página

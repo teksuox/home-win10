@@ -65,6 +65,40 @@ router.post('/api/datos/pagina', async (req, res) => {
   }
 });
 
+// Actualizar una página existente
+router.put('/api/datos/editarpagina', async (req, res) => {
+  try {
+    const { id, pagina: paginaActualizada } = req.body;
+    
+    // Buscar todas las categorías
+    const categorias = await Categoria.find({});
+    let paginaEncontrada = false;
+    
+    // Buscar la página en todas las categorías
+    for (const categoria of categorias) {
+      const paginaIndex = categoria.paginas.findIndex(p => p.id == id);
+      
+      if (paginaIndex !== -1) {
+        // Actualizar la página
+        categoria.paginas[paginaIndex] = paginaActualizada;
+        await categoria.save();
+        
+        paginaEncontrada = true;
+        break;
+      }
+    }
+    
+    if (paginaEncontrada) {
+      res.json({ message: 'Página actualizada correctamente' });
+    } else {
+      res.status(404).json({ message: 'Página no encontrada' });
+    }
+  } catch (error) {
+    console.error('Error al actualizar página:', error);
+    res.status(500).json({ message: 'Error al actualizar página' });
+  }
+});
+
 // Eliminar una página
 router.delete('/api/datos/pagina/:id', async (req, res) => {
   try {

@@ -156,6 +156,36 @@ export const useDatosStore = defineStore('datos', () => {
     }
   }
   
+  // Actualizar una página existente
+  const actualizarPagina = async (paginaActualizada) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/datos/editarpagina', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: paginaActualizada.id,
+          pagina: paginaActualizada
+        })
+      })
+      
+      if (!response.ok) {
+        throw new Error('Error al actualizar página')
+      }
+      
+      const result = await response.json()
+      console.log('Página actualizada:', result.message)
+      
+      // Recargar los datos para reflejar los cambios
+      await cargarDatos()
+    } catch (error) {
+      console.error('Error al actualizar página:', error)
+      // Guardar datos actuales en localStorage incluso si falla el backend
+      guardarEnLocalStorage(datos.value)
+    }
+  }
+  
   // Obtener lista de categorías
   const categorias = computed(() => {
     return datos.value.map(item => ({
@@ -183,6 +213,7 @@ export const useDatosStore = defineStore('datos', () => {
     guardarOrden,
     guardarConfiguracionColumnas,
     cargarConfiguracionColumnas,
-    agregarPagina
+    agregarPagina,
+    actualizarPagina
   }
 })

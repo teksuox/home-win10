@@ -24,7 +24,7 @@
       <button class="btn btn-primary rounded-circle square-btn" data-bs-toggle="modal" data-bs-target="#Modal_Configuracion">
         <i class="bi bi-gear"></i>
       </button>
-      <button class="btn btn-light rounded-circle square-btn" data-bs-toggle="modal" data-bs-target="#Modal_Formulario">
+      <button class="btn btn-light rounded-circle square-btn" @click="datosModal.EditarDatosFormulario(false)" data-bs-toggle="modal" data-bs-target="#Modal_Formulario">
         <i class="bi bi-plus-lg"></i>
       </button>
       <button class="btn btn-warning rounded-circle square-btn" @click="toggleDarkMode">
@@ -37,16 +37,16 @@
   </div>
   <ModalConfiguracion />
   <ModalFormulario />
-  <ModalPrueba />
 </template>
 
 <script setup>
 import { ref, onMounted, watch, provide } from 'vue'
 import ModalConfiguracion from '@/components/Modal_Configuracion.vue'
 import ModalFormulario from '@/components/Modal_Formulario.vue'
-import ModalPrueba from '@/components/Modal_Prueba.vue'
+import { useDatosModal } from '@/stores/datosmodal'
 
 const darkMode = ref(false)
+const datosModal = useDatosModal()
 
 const toggleDarkMode = () => {
   darkMode.value = !darkMode.value
@@ -78,5 +78,9 @@ onMounted(() => {
 watch(darkMode, (newVal) => {
   localStorage.setItem('darkMode', newVal.toString())
 })
+
+function FormularioNoEditable() {
+  datosModal.EditarDatosFormulario(false)
+}
 
 </script>
