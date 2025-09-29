@@ -1,9 +1,19 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useAuthStore } from './login'
 
 export const useDatosStore = defineStore('datos', () => {
   const datos = ref([])
   const columnasSeleccionadas = ref(3)
+  const authStore = useAuthStore()
+  
+  // Función para obtener headers con token de autenticación
+  const getAuthHeaders = () => {
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authStore.token}`
+    }
+  }
   
   // Guardar datos en localStorage
   const guardarEnLocalStorage = (data) => {
@@ -34,14 +44,27 @@ export const useDatosStore = defineStore('datos', () => {
         datos.value = localData
       }
       
+      // Verificar si el usuario está autenticado antes de cargar desde backend
+      if (!authStore.isAuthenticated) {
+        console.warn('Usuario no autenticado, usando datos locales')
+        return
+      }
+      
       // Luego intentar cargar desde el backend
-      const response = await fetch('http://localhost:3000/api/datos')
+      const response = await fetch('http://localhost:3000/api/datos', {
+        headers: getAuthHeaders()
+      })
+      
       if (response.ok) {
         const data = await response.json()
         datos.value = data
         // Guardar en localStorage después de obtener datos del backend
         guardarEnLocalStorage(data)
-      } 
+      } else if (response.status === 401) {
+        // Token inválido, cerrar sesión
+        authStore.logout()
+        throw new Error('Sesión expirada')
+      }
     } catch (error) {
       console.error('Error al cargar los datos:', error)
       // Fallback a datos locales si hay error de conexión
@@ -59,15 +82,21 @@ export const useDatosStore = defineStore('datos', () => {
   // Guardar el orden de las páginas en el backend
   const guardarOrden = async () => {
     try {
+      if (!authStore.isAuthenticated) {
+        throw new Error('Usuario no autenticado')
+      }
+      
       const response = await fetch('http://localhost:3000/api/datos/orden', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ datos: datos.value })
       })
       
       if (!response.ok) {
+        if (response.status === 401) {
+          authStore.logout()
+          throw new Error('Sesión expirada')
+        }
         throw new Error('Error al guardar el orden')
       }
       
@@ -79,22 +108,29 @@ export const useDatosStore = defineStore('datos', () => {
       console.error('Error al guardar el orden:', error)
       // Guardar en localStorage incluso si falla el backend
       guardarEnLocalStorage(datos.value)
+      throw error
     }
   }
   
   // Guardar configuración de columnas
   const guardarConfiguracionColumnas = async (columnas) => {
     try {
+      if (!authStore.isAuthenticated) {
+        throw new Error('Usuario no autenticado')
+      }
+      
       columnasSeleccionadas.value = columnas
       const response = await fetch('http://localhost:3000/api/configuracion/columnas', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ columnas })
       })
       
       if (!response.ok) {
+        if (response.status === 401) {
+          authStore.logout()
+          throw new Error('Sesión expirada')
+        }
         throw new Error('Error al guardar configuración')
       }
       
@@ -102,13 +138,21 @@ export const useDatosStore = defineStore('datos', () => {
       console.log('Configuración guardada:', result.message)
     } catch (error) {
       console.error('Error al guardar configuración:', error)
+      throw error
     }
   }
   
   // Cargar configuración de columnas
   const cargarConfiguracionColumnas = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/configuracion/columnas')
+      if (!authStore.isAuthenticated) {
+        return columnasSeleccionadas.value
+      }
+      
+      const response = await fetch('http://localhost:3000/api/configuracion/columnas', {
+        headers: getAuthHeaders()
+      })
+      
       if (response.ok) {
         const data = await response.json()
         columnasSeleccionadas.value = data.columnas
@@ -123,11 +167,13 @@ export const useDatosStore = defineStore('datos', () => {
   // Agregar una nueva página
   const agregarPagina = async (nuevaPagina) => {
     try {
+      if (!authStore.isAuthenticated) {
+        throw new Error('Usuario no autenticado')
+      }
+      
       const response = await fetch('http://localhost:3000/api/datos/pagina', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           categoria: nuevaPagina.categoria,
           pagina: {
@@ -141,6 +187,10 @@ export const useDatosStore = defineStore('datos', () => {
       })
       
       if (!response.ok) {
+        if (response.status === 401) {
+          authStore.logout()
+          throw new Error('Sesión expirada')
+        }
         throw new Error('Error al agregar página')
       }
       
@@ -153,17 +203,20 @@ export const useDatosStore = defineStore('datos', () => {
       console.error('Error al agregar página:', error)
       // Guardar datos actuales en localStorage incluso si falla el backend
       guardarEnLocalStorage(datos.value)
+      throw error
     }
   }
   
   // Actualizar una página existente
   const actualizarPagina = async (paginaActualizada) => {
     try {
+      if (!authStore.isAuthenticated) {
+        throw new Error('Usuario no autenticado')
+      }
+      
       const response = await fetch('http://localhost:3000/api/datos/editarpagina', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           id: paginaActualizada.id,
           pagina: paginaActualizada
@@ -171,6 +224,10 @@ export const useDatosStore = defineStore('datos', () => {
       })
       
       if (!response.ok) {
+        if (response.status === 401) {
+          authStore.logout()
+          throw new Error('Sesión expirada')
+        }
         throw new Error('Error al actualizar página')
       }
       
@@ -183,6 +240,7 @@ export const useDatosStore = defineStore('datos', () => {
       console.error('Error al actualizar página:', error)
       // Guardar datos actuales en localStorage incluso si falla el backend
       guardarEnLocalStorage(datos.value)
+      throw error
     }
   }
   

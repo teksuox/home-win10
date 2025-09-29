@@ -1,33 +1,57 @@
 const express = require('express');
 const router = express.Router();
-const Categoria = require('../models/Pagina');
+const Pagina = require('../models/Pagina');
+const jwt = require('jsonwebtoken');
 
-// Obtener todos los datos (categorías y páginas)
-router.get('/api/datos', async (req, res) => {
+// Middleware para verificar token
+const verifyToken = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+  
+  if (!token) {
+    return res.status(401).json({ message: 'Acceso denegado. No se proporcionó token.' });
+  }
+  
   try {
-    const categorias = await Categoria.find({});
-    res.json(categorias);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secreto_por_defecto');
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(400).json({ message: 'Token inválido' });
+  }
+};
+
+// Obtener todos los datos (categorías y páginas) del usuario
+router.get('/api/datos', verifyToken, async (req, res) => {
+  try {
+    const paginas = await Pagina.find({ usuario: req.user.id });
+    res.json(paginas);
   } catch (error) {
     console.error('Error al obtener datos:', error);
     res.status(500).json({ message: 'Error al obtener datos' });
   }
 });
 
-// Guardar el orden de las páginas
-router.post('/api/datos/orden', async (req, res) => {
+// Guardar el orden de las páginas del usuario
+router.post('/api/datos/orden', verifyToken, async (req, res) => {
   try {
     const { datos } = req.body;
     
-    // Eliminar todos los datos existentes
-    await Categoria.deleteMany({});
+    // Eliminar todos los datos existentes del usuario
+    await Pagina.deleteMany({ usuario: req.user.id });
     
     // Insertar solo las categorías que tienen páginas
     const datosConPaginas = datos.filter(categoria => 
       categoria.paginas && categoria.paginas.length > 0
     );
     
-    if (datosConPaginas.length > 0) {
-      await Categoria.insertMany(datosConPaginas);
+    // Asociar cada categoría con el usuario
+    const datosConUsuario = datosConPaginas.map(categoria => ({
+      ...categoria,
+      usuario: req.user.id
+    }));
+    
+    if (datosConUsuario.length > 0) {
+      await Pagina.insertMany(datosConUsuario);
     }
     
     res.json({ message: 'Orden guardado correctamente' });
@@ -37,23 +61,24 @@ router.post('/api/datos/orden', async (req, res) => {
   }
 });
 
-// Agregar una nueva página
-router.post('/api/datos/pagina', async (req, res) => {
+// Agregar una nueva página al usuario
+router.post('/api/datos/pagina', verifyToken, async (req, res) => {
   try {
     const { categoria, pagina } = req.body;
     
-    // Buscar la categoría
-    let categoriaDoc = await Categoria.findOne({ categoria });
+    // Buscar la categoría del usuario
+    let categoriaDoc = await Pagina.findOne({ categoria, usuario: req.user.id });
     
     if (categoriaDoc) {
       // Si la categoría existe, agregar la página
       categoriaDoc.paginas.push(pagina);
       await categoriaDoc.save();
     } else {
-      // Si la categoría no existe, crearla
-      categoriaDoc = new Categoria({
+      // Si la categoría no existe, crearla asociada al usuario
+      categoriaDoc = new Pagina({
         categoria,
-        paginas: [pagina]
+        paginas: [pagina],
+        usuario: req.user.id
       });
       await categoriaDoc.save();
     }
@@ -65,16 +90,16 @@ router.post('/api/datos/pagina', async (req, res) => {
   }
 });
 
-// Actualizar una página existente
-router.put('/api/datos/editarpagina', async (req, res) => {
+// Actualizar una página existente del usuario
+router.put('/api/datos/editarpagina', verifyToken, async (req, res) => {
   try {
     const { id, pagina: paginaActualizada } = req.body;
     
-    // Buscar todas las categorías
-    const categorias = await Categoria.find({});
+    // Buscar todas las categorías del usuario
+    const categorias = await Pagina.find({ usuario: req.user.id });
     let paginaEncontrada = false;
     
-    // Buscar la página en todas las categorías
+    // Buscar la página en todas las categorías del usuario
     for (const categoria of categorias) {
       const paginaIndex = categoria.paginas.findIndex(p => p.id == id);
       
@@ -99,16 +124,16 @@ router.put('/api/datos/editarpagina', async (req, res) => {
   }
 });
 
-// Eliminar una página
-router.delete('/api/datos/pagina/:id', async (req, res) => {
+// Eliminar una página del usuario
+router.delete('/api/datos/pagina/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Buscar todas las categorías
-    const categorias = await Categoria.find({});
+    // Buscar todas las categorías del usuario
+    const categorias = await Pagina.find({ usuario: req.user.id });
     let paginaEliminada = false;
     
-    // Buscar la página en todas las categorías
+    // Buscar la página en todas las categorías del usuario
     for (const categoria of categorias) {
       const paginaIndex = categoria.paginas.findIndex(p => p.id == id);
       
@@ -118,7 +143,7 @@ router.delete('/api/datos/pagina/:id', async (req, res) => {
         
         // Si la categoría queda sin páginas, eliminarla
         if (categoria.paginas.length === 0) {
-          await Categoria.deleteOne({ _id: categoria._id });
+          await Pagina.deleteOne({ _id: categoria._id });
         } else {
           await categoria.save();
         }
@@ -139,11 +164,11 @@ router.delete('/api/datos/pagina/:id', async (req, res) => {
   }
 });
 
-// Actualizar configuración de columnas
-router.post('/api/configuracion/columnas', (req, res) => {
+// Actualizar configuración de columnas del usuario
+router.post('/api/configuracion/columnas', verifyToken, (req, res) => {
   try {
     const { columnas } = req.body;
-    // En una implementación real, esto se guardaría en la base de datos
+    // En una implementación real, esto se guardaría en la base de datos asociado al usuario
     // Por ahora, solo confirmamos que se recibió la configuración
     res.json({ message: 'Configuración de columnas guardada', columnas });
   } catch (error) {
@@ -152,10 +177,10 @@ router.post('/api/configuracion/columnas', (req, res) => {
   }
 });
 
-// Obtener configuración de columnas
-router.get('/api/configuracion/columnas', (req, res) => {
+// Obtener configuración de columnas del usuario
+router.get('/api/configuracion/columnas', verifyToken, (req, res) => {
   try {
-    // En una implementación real, esto se obtendría de la base de datos
+    // En una implementación real, esto se obtendría de la base de datos del usuario
     // Por ahora, devolvemos un valor por defecto
     res.json({ columnas: 3 });
   } catch (error) {

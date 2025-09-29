@@ -1,35 +1,35 @@
 const mongoose = require('mongoose');
 
 const paginaSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: true,
-    unique: true
-  },
-  nombre: {
-    type: String,
-    required: true
-  },
-  url: {
-    type: String,
-    required: true
-  },
-  icono: {
-    type: String,
-    required: true
-  },
   categoria: {
     type: String,
+    required: true
+  },
+  paginas: [{
+    id: {
+      type: Number,
+      required: true
+    },
+    nombre: {
+      type: String,
+      required: true
+    },
+    url: {
+      type: String,
+      required: true
+    },
+    icono: {
+      type: String,
+      required: true
+    }
+  }],
+  usuario: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
     required: true
   }
+}, {
+  timestamps: true
 });
 
-const categoriaSchema = new mongoose.Schema({
-  categoria: {
-    type: String,
-    required: true
-  },
-  paginas: [paginaSchema]
-});
-
-module.exports = mongoose.model('Categoria', categoriaSchema);
+module.exports = mongoose.model('Pagina', paginaSchema);

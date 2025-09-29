@@ -2,8 +2,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const authRoutes = require('./routes/auth');
 const datosRoutes = require('./routes/datos');
 
+// Inicializar la aplicación Express PRIMERO
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -11,38 +13,19 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Conexión a MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://root:example@mongodb:27017/?authSource=admin';
+// Conectar a MongoDB
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/home', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('Conectado a MongoDB'))
+.catch(err => console.error('Error al conectar a MongoDB:', err));
 
-mongoose.connect(MONGODB_URI);
-
-// Verificar conexión
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, '❌ Error de conexión a MongoDB:'));
-db.once('open', () => {
-  console.log('✅ Conectado a MongoDB');
-});
-
-// Rutas
+// Rutas - DEBEN ir DESPUÉS de inicializar app
+app.use('/', authRoutes);
 app.use('/', datosRoutes);
 
-// Endpoint de prueba
-app.get('/api/status', (req, res) => {
-  if (db.readyState === 1) {
-    res.json({ 
-      status: 'OK', 
-      message: 'Conectado a MongoDB',
-      timestamp: new Date().toISOString()
-    });
-  } else {
-    res.status(500).json({ 
-      status: 'ERROR', 
-      message: 'No conectado a MongoDB',
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+// Iniciar el servidor
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

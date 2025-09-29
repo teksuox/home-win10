@@ -30,7 +30,7 @@
       <button class="btn btn-warning rounded-circle square-btn" @click="toggleDarkMode">
         <i class="bi" :class="darkMode ? 'bi-sun' : 'bi-moon'"></i>
       </button>
-      <button class="btn btn-danger rounded-circle square-btn">
+      <button class="btn btn-danger rounded-circle square-btn" @click="handleLogout">
         <i class="bi bi-box-arrow-right"></i>
       </button>
     </div>
@@ -44,12 +44,22 @@ import { ref, onMounted, watch, provide } from 'vue'
 import ModalConfiguracion from '@/components/Modal_Configuracion.vue'
 import ModalFormulario from '@/components/Modal_Formulario.vue'
 import { useDatosModal } from '@/stores/datosmodal'
+import { useAuthStore } from '@/stores/login'
+import { useRouter } from 'vue-router'
 
 const darkMode = ref(false)
 const datosModal = useDatosModal()
+const authStore = useAuthStore()
+const router = useRouter()
 
 const toggleDarkMode = () => {
   darkMode.value = !darkMode.value
+}
+
+// Función para cerrar sesión
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
 }
 
 // Proporcionar la función toggleDarkMode y el estado darkMode a los componentes hijos
