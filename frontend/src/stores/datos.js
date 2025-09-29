@@ -4,7 +4,6 @@ import { useAuthStore } from './login'
 
 export const useDatosStore = defineStore('datos', () => {
   const datos = ref([])
-  const columnasSeleccionadas = ref(3)
   const authStore = useAuthStore()
   
   // Función para obtener headers con token de autenticación
@@ -86,6 +85,14 @@ export const useDatosStore = defineStore('datos', () => {
         throw new Error('Usuario no autenticado')
       }
       
+      // Filtrar categorías que tienen páginas
+      const datosConPaginas = datos.value.filter(categoria => 
+        categoria.paginas && categoria.paginas.length > 0
+      );
+      
+      // Actualizar los datos filtrados
+      datos.value = datosConPaginas;
+      
       const response = await fetch('http://localhost:3000/api/datos/orden', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -109,58 +116,6 @@ export const useDatosStore = defineStore('datos', () => {
       // Guardar en localStorage incluso si falla el backend
       guardarEnLocalStorage(datos.value)
       throw error
-    }
-  }
-  
-  // Guardar configuración de columnas
-  const guardarConfiguracionColumnas = async (columnas) => {
-    try {
-      if (!authStore.isAuthenticated) {
-        throw new Error('Usuario no autenticado')
-      }
-      
-      columnasSeleccionadas.value = columnas
-      const response = await fetch('http://localhost:3000/api/configuracion/columnas', {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ columnas })
-      })
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          authStore.logout()
-          throw new Error('Sesión expirada')
-        }
-        throw new Error('Error al guardar configuración')
-      }
-      
-      const result = await response.json()
-      console.log('Configuración guardada:', result.message)
-    } catch (error) {
-      console.error('Error al guardar configuración:', error)
-      throw error
-    }
-  }
-  
-  // Cargar configuración de columnas
-  const cargarConfiguracionColumnas = async () => {
-    try {
-      if (!authStore.isAuthenticated) {
-        return columnasSeleccionadas.value
-      }
-      
-      const response = await fetch('http://localhost:3000/api/configuracion/columnas', {
-        headers: getAuthHeaders()
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        columnasSeleccionadas.value = data.columnas
-      }
-      return columnasSeleccionadas.value
-    } catch (error) {
-      console.error('Error al cargar configuración:', error)
-      return columnasSeleccionadas.value
     }
   }
   
@@ -251,26 +206,11 @@ export const useDatosStore = defineStore('datos', () => {
     }))
   })
   
-  // Clase de columna basada en la selección del usuario
-  const columnaClase = computed(() => {
-    const clases = {
-      2: 'col-md-6 col-lg-6 mb-4',
-      3: 'col-md-4 col-lg-4 mb-4',
-      4: 'col-md-3 col-lg-3 mb-4',
-      6: 'col-md-2 col-lg-2 mb-4'
-    }
-    return clases[columnasSeleccionadas.value] || 'col-md-4 col-lg-4 mb-4'
-  })
-  
   return {
     datos,
-    columnasSeleccionadas,
     categorias,
-    columnaClase,
     cargarDatos,
     guardarOrden,
-    guardarConfiguracionColumnas,
-    cargarConfiguracionColumnas,
     agregarPagina,
     actualizarPagina
   }

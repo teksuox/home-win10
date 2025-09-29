@@ -7,15 +7,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-3">
-            <label for="columnas" class="form-label">Número de columnas</label>
-            <select id="columnas" class="form-select" v-model="datosStore.columnasSeleccionadas" @change="guardarConfiguracion">
-              <option value="2">2 columnas</option>
-              <option value="3">3 columnas</option>
-              <option value="4">4 columnas</option>
-              <option value="6">6 columnas</option>
-            </select>
-          </div>
+          <p>Configuración de la aplicación</p>
         </div>
       </div>
     </div>
@@ -23,24 +15,5 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { useDatosStore } from '@/stores/datos'
-
-const datosStore = useDatosStore()
-
-// Cargar configuración inicial desde localStorage cuando se monta el componente
-onMounted(() => {
-  datosStore.cargarConfiguracionColumnas()
-})
-
-// Función para guardar la configuración
-const guardarConfiguracion = () => {
-  // Guardar en localStorage usando el store
-  datosStore.guardarConfiguracionColumnas(datosStore.columnasSeleccionadas)
-  
-  // Emitir un evento para notificar a otros componentes del cambio
-  window.dispatchEvent(new CustomEvent('configuracionActualizada', {
-    detail: { columnas: datosStore.columnasSeleccionadas }
-  }))
-}
+// Modal de configuración sin opciones de columnas
 </script>

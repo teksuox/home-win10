@@ -1,0 +1,51 @@
+.categoria-container {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  min-width: 250px;
+  backdrop-filter: blur(10px);
+}
+
+.pagina-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 5px;
+  width: 100px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.pagina-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+.pagina-content img {
+  margin-bottom: 8px;
+}
+
+.pagina-content span {
+  font-size: 0.8rem;
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pagina-actions {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.drag-handle {
+  user-select: none;
+}

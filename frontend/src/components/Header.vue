@@ -6,13 +6,13 @@
         <div class="ms-2">
           <div class="fw-bold">25°C</div>
           <div>Soleado</div>
-          <div class="small">Ciudad de México</div>
+          <div class="small d-md-block d-none">Ciudad de México</div>
         </div>
       </div>
     </div>
     <div class="col text-center d-flex align-items-center justify-content-center">
       <form class="w-100">
-        <div class="input-group search-input">
+        <div class="input-group search-input d-md-flex d-none">
           <input type="text" class="form-control form-control-sm" placeholder="Buscar..." style="outline: none; box-shadow: none;">
           <button class="btn btn-secondary btn-outline-secondary" type="submit">
             <i class="bi bi-search text-white"></i>
@@ -20,7 +20,7 @@
         </div>
       </form>
     </div>
-    <div class="col-auto  p-2 d-flex align-items-center gap-2">
+    <div class="col-auto p-2 d-flex align-items-center gap-2">
       <button class="btn btn-primary rounded-circle square-btn" data-bs-toggle="modal" data-bs-target="#Modal_Configuracion">
         <i class="bi bi-gear"></i>
       </button>
@@ -33,6 +33,19 @@
       <button class="btn btn-danger rounded-circle square-btn" @click="handleLogout">
         <i class="bi bi-box-arrow-right"></i>
       </button>
+    </div>
+  </div>
+  <!-- Barra de búsqueda para móviles -->
+  <div class="row d-md-none mt-2 px-2">
+    <div class="col-12">
+      <form class="w-100">
+        <div class="input-group search-input">
+          <input type="text" class="form-control form-control-sm" placeholder="Buscar..." style="outline: none; box-shadow: none;">
+          <button class="btn btn-secondary btn-outline-secondary" type="submit">
+            <i class="bi bi-search text-white"></i>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
   <ModalConfiguracion />
