@@ -50,7 +50,7 @@ export const useDatosStore = defineStore('datos', () => {
       }
       
       // Luego intentar cargar desde el backend
-      const response = await fetch('http://localhost:3001/api/datos', {
+      const response = await fetch('http://backend:3001/api/datos', {
         headers: getAuthHeaders()
       })
       
@@ -93,7 +93,7 @@ export const useDatosStore = defineStore('datos', () => {
       // Actualizar los datos filtrados
       datos.value = datosConPaginas;
       
-      const response = await fetch('http://localhost:3001/api/datos/orden', {
+      const response = await fetch('http://backend:3001/api/datos/orden', {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ datos: datos.value })
@@ -126,7 +126,7 @@ export const useDatosStore = defineStore('datos', () => {
         throw new Error('Usuario no autenticado')
       }
       
-      const response = await fetch('http://localhost:3001/api/datos/pagina', {
+      const response = await fetch('http://backend:3001/api/datos/pagina', {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -169,7 +169,7 @@ export const useDatosStore = defineStore('datos', () => {
         throw new Error('Usuario no autenticado')
       }
       
-      const response = await fetch('http://localhost:3001/api/datos/editarpagina', {
+      const response = await fetch('http://backend:3001/api/datos/editarpagina', {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({
