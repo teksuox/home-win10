@@ -7,7 +7,7 @@ services:
       dockerfile: ../Dockerfile.frontend
     container_name: vue3_frontend
     ports:
-      - "90:80"
+      - "8500:80"
     restart: unless-stopped
     depends_on:
       - backend
@@ -20,7 +20,7 @@ services:
       dockerfile: ../Dockerfile.backend
     container_name: node_backend
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
       MONGODB_URI: mongodb://root:example@mongodb:27017/?authSource=admin
       NODE_ENV: production
