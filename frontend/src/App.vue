@@ -6,7 +6,7 @@ import { onMounted } from 'vue'
 const testMongoConnection = async () => {
   try {
     // Reemplaza esta URL con la de tu endpoint de backend
-    const response = await fetch('http://backend:3001/api/status')
+    const response = await fetch('https://api.home.ts/api/status')
     
     if (response.ok) {
       const data = await response.json()
