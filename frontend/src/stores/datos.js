@@ -52,7 +52,7 @@ export const useDatosStore = defineStore('datos', () => {
       }
       
       // Luego intentar cargar desde el backend
-      const response = await fetch(`${API_BASE_URL}/api/datos`, {
+      const response = await fetch(`${API_BASE_URL}/datos`, {
         headers: getAuthHeaders()
       })
       
@@ -95,7 +95,7 @@ export const useDatosStore = defineStore('datos', () => {
       // Actualizar los datos filtrados
       datos.value = datosConPaginas;
       
-      const response = await fetch(`${API_BASE_URL}/api/datos/orden`, {
+      const response = await fetch(`${API_BASE_URL}/datos/orden`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ datos: datos.value })
@@ -128,7 +128,7 @@ export const useDatosStore = defineStore('datos', () => {
         throw new Error('Usuario no autenticado')
       }
       
-      const response = await fetch(`${API_BASE_URL}/api/datos/pagina`, {
+      const response = await fetch(`${API_BASE_URL}/datos/pagina`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -171,7 +171,7 @@ export const useDatosStore = defineStore('datos', () => {
         throw new Error('Usuario no autenticado')
       }
       
-      const response = await fetch(`${API_BASE_URL}/api/datos/editarpagina`, {
+      const response = await fetch(`${API_BASE_URL}/datos/editarpagina`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({
