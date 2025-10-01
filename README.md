@@ -15,7 +15,7 @@ programando pero creo que me salvo.
 - frontend 
 ```
 npm install
-nvp run dev
+nvm run dev
 ```
 
 - backend
