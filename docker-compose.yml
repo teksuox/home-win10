@@ -5,7 +5,9 @@ services:
     build:
       context: ./frontend
       dockerfile: ../Dockerfile.frontend
-    image: home-frontend:1.0.3
+      args:
+        - VITE_API_URL=http://localhost:3001
+    image: home-frontend:1.0.4
     container_name: vue3_frontend
     ports:
       - "8500:80"
@@ -19,10 +21,11 @@ services:
     build:
       context: ./backend
       dockerfile: ../Dockerfile.backend
-    image: home-backend:1.0.3
+    image: home-backend:1.0.4
     container_name: node_backend
     ports:
       - "3001:3001"
+    restart: unless-stopped
     environment:
       MONGODB_URI: mongodb://root:6oy6MPHe07XcsH@mongodb:27017/?authSource=admin
       NODE_ENV: production
