@@ -25,7 +25,7 @@ npm run dev
 ```
 
 ## Vhost
-- se coloca en Vhost para que este apuntando el servidor Backend, ya viene configurado si lo se
+- se coloca en Vhost para que este apuntando el servidor Backend, ya viene configurado si se
 usa en modo local, pero si lo usas con un dominio es recomendado modificar el Vhost
 ```
 location /api/ {
