@@ -28,10 +28,10 @@
                   >
                     <template #item="{ element }">
                       <div class="pagina-item">
-                        <div class="pagina-content" @click="abrirPagina(element.url)">
+                        <a :href="element.url" class="pagina-content" style="text-decoration: none; color: inherit;">
                           <img :src="element.icono" :alt="element.nombre" width="32" height="32" />
                           <span class="text-dark mt-2">{{ element.nombre }}</span>
-                        </div>
+                        </a>
                         <div class="pagina-actions">
                           <div class="dropdown">
                             <button class="btn btn-sm p-0 text-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -78,10 +78,10 @@
                   >
                     <template #item="{ element }">
                       <div class="pagina-item">
-                        <div class="pagina-content" @click="abrirPagina(element.url)">
+                        <a :href="element.url" class="pagina-content" style="text-decoration: none; color: inherit;">
                           <img :src="element.icono" :alt="element.nombre" width="32" height="32" />
                           <span class="text-dark mt-2">{{ element.nombre }}</span>
-                        </div>
+                        </a>
                         <div class="pagina-actions">
                           <div class="dropdown">
                             <button class="btn btn-sm p-0 text-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -134,11 +134,6 @@ const getCategoriaClass = () => {
     // Para 5 o más categorías, usar un tamaño fijo más pequeño
     return 'col-12 col-md-4 col-lg-3 mb-4 categoria-container';
   }
-}
-
-// Función para abrir una página en la misma pestaña
-const abrirPagina = (url) => {
-  window.location.href = url
 }
 
 // Función para editar una página

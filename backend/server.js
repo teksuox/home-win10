@@ -9,11 +9,9 @@ const PORT = process.env.PORT || 3001;
 
 // Lista de dominios permitidos
 const allowedOrigins = [
-  'https://www.home.ts',
   'https://home.ts',
-  'http://www.home.ts',
-  'http://home.ts'
-  
+  'http://home.ts',
+  'http://localhost:8500'  
 ];
 
 // Configuración de CORS

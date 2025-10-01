@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
   const user = ref(null)
@@ -8,7 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(username, password) {
     try {
-      const response = await fetch('https://api.home.ts/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -39,7 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function register(username, password) {
     try {
-      const response = await fetch('https://api.home.ts/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

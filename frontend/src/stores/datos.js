@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useAuthStore } from './login'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 export const useDatosStore = defineStore('datos', () => {
   const datos = ref([])
   const authStore = useAuthStore()
@@ -50,7 +52,7 @@ export const useDatosStore = defineStore('datos', () => {
       }
       
       // Luego intentar cargar desde el backend
-      const response = await fetch('https://api.home.ts/api/datos', {
+      const response = await fetch(`${API_BASE_URL}/api/datos`, {
         headers: getAuthHeaders()
       })
       
@@ -93,7 +95,7 @@ export const useDatosStore = defineStore('datos', () => {
       // Actualizar los datos filtrados
       datos.value = datosConPaginas;
       
-      const response = await fetch('https://api.home.ts/api/datos/orden', {
+      const response = await fetch(`${API_BASE_URL}/api/datos/orden`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ datos: datos.value })
@@ -126,7 +128,7 @@ export const useDatosStore = defineStore('datos', () => {
         throw new Error('Usuario no autenticado')
       }
       
-      const response = await fetch('https://api.home.ts/api/datos/pagina', {
+      const response = await fetch(`${API_BASE_URL}/api/datos/pagina`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -169,7 +171,7 @@ export const useDatosStore = defineStore('datos', () => {
         throw new Error('Usuario no autenticado')
       }
       
-      const response = await fetch('https://api.home.ts/api/datos/editarpagina', {
+      const response = await fetch(`${API_BASE_URL}/api/datos/editarpagina`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({
