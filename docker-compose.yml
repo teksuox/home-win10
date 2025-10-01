@@ -7,7 +7,7 @@ services:
       dockerfile: ../Dockerfile.frontend
       args:
         - VITE_API_URL=/api
-    image: teksuox/home-frontend:1.0.7
+    image: teksuox/home-frontend:1.0.8
     container_name: vue3_frontend
     ports:
       - "8500:80"
@@ -21,7 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: ../Dockerfile.backend
-    image: teksuox/home-backend:1.0.7
+    image: teksuox/home-backend:1.0.8
     container_name: node_backend
     ports:
       - "3001:3001"
