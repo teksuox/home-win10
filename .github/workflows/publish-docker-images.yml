@@ -1,0 +1,53 @@
+# Nombre del flujo de trabajo que aparecerá en la pestaña "Actions" de GitHub
+name: Publish Docker Images
+
+# Define cuándo se debe ejecutar este flujo de trabajo
+on:
+  # Se ejecuta cada vez que se hace un push a la rama "main"
+  push:
+    branches: [ "main" ]
+
+# Define los trabajos (jobs) que se ejecutarán
+jobs:
+  # Nombre del trabajo
+  build_and_push:
+    # El tipo de máquina virtual en la que se ejecutará el trabajo
+    runs-on: ubuntu-latest
+
+    # La secuencia de pasos que se ejecutarán en el trabajo
+    steps:
+      # 1. Descarga el código de tu repositorio a la máquina virtual
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      # 2. Inicia sesión en Docker Hub usando los secretos que creaste
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Construye y sube la imagen del frontend
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          # El contexto de construcción (la carpeta que contiene el Dockerfile y el código)
+          context: ./frontend
+          # La ruta al Dockerfile
+          file: ./Dockerfile.frontend
+          # Le dice a la acción que suba (push) la imagen después de construirla
+          push: true
+          # Las etiquetas para la imagen. Reemplaza 'teksuox' con tu usuario.
+          tags: teksuox/home-frontend:latest
+          # Pasa los argumentos de construcción necesarios, como la URL de la API
+          build-args: |
+            VITE_API_URL=/api
+
+      # 4. Construye y sube la imagen del backend
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./Dockerfile.backend
+          push: true
+          tags: teksuox/home-backend:latest
