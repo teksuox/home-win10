@@ -5,7 +5,7 @@ services:
     build:
       context: ./frontend
       dockerfile: ../Dockerfile.frontend
-    image: miusuario/home-frontend:1.0.2
+    image: miusuario/home-frontend:1.0.3
     container_name: vue3_frontend
     ports:
       - "8500:80"
@@ -19,7 +19,7 @@ services:
     build:
       context: ./backend
       dockerfile: ../Dockerfile.backend
-    image: miusuario/home-backend:1.0.2
+    image: miusuario/home-backend:1.0.3
     container_name: node_backend
     ports:
       - "3001:3001"
