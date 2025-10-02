@@ -1,13 +1,20 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { useAuthStore } from './login'
+import { useAuthStore } from './login';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const useDatosStore = defineStore('datos', () => {
-  const datos = ref([])
-  const authStore = useAuthStore()
+  const datos = ref([]);
+  const authStore = useAuthStore();
   
+  // Nuevo estado para la configuración
+  const configuracion = ref({
+    columnas: 3,
+    isImageBackgroundEnabled: false
+  });
+  const backgroundImageUrl = ref(null);
+
   // Función para obtener headers con token de autenticación
   const getAuthHeaders = () => {
     return {
@@ -36,6 +43,64 @@ export const useDatosStore = defineStore('datos', () => {
     }
   }
   
+  // --- NUEVAS FUNCIONES DE CONFIGURACIÓN ---
+
+  const cargarConfiguracion = async () => {
+    try {
+      // Cargar imagen desde localStorage para acceso rápido
+      const storedImage = localStorage.getItem('backgroundImage');
+      if (storedImage) {
+        backgroundImageUrl.value = storedImage;
+      }
+
+      if (!authStore.isAuthenticated) return;
+
+      // Cargar ajustes desde el backend
+      const response = await fetch(`${API_BASE_URL}/api/configuracion`, {
+        headers: getAuthHeaders()
+      });
+      if (response.ok) {
+        configuracion.value = await response.json();
+      }
+    } catch (error) {
+      console.error('Error al cargar la configuración:', error);
+    }
+  };
+
+  const guardarConfiguracion = async (newConfig, imageFile) => {
+    try {
+      // 1. Guardar la imagen en localStorage si se proporciona una nueva
+      if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const base64Image = e.target.result;
+          localStorage.setItem('backgroundImage', base64Image);
+          backgroundImageUrl.value = base64Image;
+        };
+        reader.readAsDataURL(imageFile);
+      }
+
+      // 2. Si se desactiva el fondo, no es necesario borrar la imagen de localStorage
+      //    así el usuario puede reactivarla sin volver a subirla.
+
+      // 3. Guardar los ajustes en el backend
+      if (authStore.isAuthenticated) {
+        await fetch(`${API_BASE_URL}/api/configuracion`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ config: newConfig })
+        });
+      }
+      
+      // 4. Actualizar el estado local
+      configuracion.value = newConfig;
+
+    } catch (error) {
+      console.error('Error al guardar la configuración:', error);
+    }
+  };
+
+  // --- FUNCIONES DE DATOS EXISTENTES ---
   // Cargar datos desde el backend
   const cargarDatos = async () => {
     try {
@@ -210,10 +275,14 @@ export const useDatosStore = defineStore('datos', () => {
   
   return {
     datos,
+    configuracion, // <-- Exponer configuración
+    backgroundImageUrl, // <-- Exponer URL de la imagen
     categorias,
     cargarDatos,
     guardarOrden,
     agregarPagina,
-    actualizarPagina
+    actualizarPagina,
+    cargarConfiguracion, // <-- Exponer nueva función
+    guardarConfiguracion // <-- Exponer nueva función
   }
 })

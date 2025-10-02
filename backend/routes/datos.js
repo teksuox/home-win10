@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Pagina = require('../models/Pagina');
+const Configuracion = require('../models/Configuracion'); // <-- Añadir el nuevo modelo
 const jwt = require('jsonwebtoken');
 
 // Middleware para verificar token
@@ -164,29 +165,40 @@ router.delete('/api/datos/pagina/:id', verifyToken, async (req, res) => {
   }
 });
 
-// Actualizar configuración de columnas del usuario
-router.post('/api/configuracion/columnas', verifyToken, (req, res) => {
+// Obtener configuración del usuario
+router.get('/api/configuracion', verifyToken, async (req, res) => {
   try {
-    const { columnas } = req.body;
-    // En una implementación real, esto se guardaría en la base de datos asociado al usuario
-    // Por ahora, solo confirmamos que se recibió la configuración
-    res.json({ message: 'Configuración de columnas guardada', columnas });
+    let configDoc = await Configuracion.findOne({ usuario: req.user.id });
+    if (!configDoc) {
+      // Si no existe, crear una configuración por defecto para el usuario
+      configDoc = new Configuracion({
+        usuario: req.user.id,
+        config: { columnas: 3, isImageBackgroundEnabled: false }
+      });
+      await configDoc.save();
+    }
+    res.json(configDoc.config);
+  } catch (error) {
+    console.error('Error al obtener configuración:', error);
+    res.status(500).json({ message: 'Error al obtener configuración' });
+  }
+});
+
+// Guardar/Actualizar configuración del usuario
+router.post('/api/configuracion', verifyToken, async (req, res) => {
+  try {
+    const { config } = req.body;
+    const updatedConfig = await Configuracion.findOneAndUpdate(
+      { usuario: req.user.id },
+      { config },
+      { new: true, upsert: true } // upsert: true crea el documento si no existe
+    );
+    res.json({ message: 'Configuración guardada correctamente', config: updatedConfig.config });
   } catch (error) {
     console.error('Error al guardar configuración:', error);
     res.status(500).json({ message: 'Error al guardar configuración' });
   }
 });
 
-// Obtener configuración de columnas del usuario
-router.get('/api/configuracion/columnas', verifyToken, (req, res) => {
-  try {
-    // En una implementación real, esto se obtendría de la base de datos del usuario
-    // Por ahora, devolvemos un valor por defecto
-    res.json({ columnas: 3 });
-  } catch (error) {
-    console.error('Error al obtener configuración:', error);
-    res.status(500).json({ message: 'Error al obtener configuración' });
-  }
-});
 
 module.exports = router;

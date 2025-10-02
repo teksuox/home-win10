@@ -83,3 +83,11 @@ body.dark-mode .btn-close {
   filter: invert(1);
 }
 
+/* Estilos para el fondo de imagen */
+body.background-image-active {
+  /* La URL de la imagen se establece desde JS usando la variable --bg-image */
+  background: var(--bg-image) center center / cover no-repeat fixed !important;
+  /* Desactivar la animación del gradiente cuando la imagen está activa */
+  animation: none !important;
+}
+
