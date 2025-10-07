@@ -4,7 +4,11 @@
     
     <!-- modo escritorio -->
     <div class="container-fluid d-flex flex-column mt-3 flex-grow-1">
-      <div class="row d-none d-md-flex justify-content-center h-100">
+      <div class="row d-none d-md-flex h-10">
+        <Marcadores />
+      </div>
+
+      <div class="row d-none d-md-flex justify-content-center h-90">
         <div class="col-12">
           <draggable 
             v-model="datosStore.datos" 
@@ -25,6 +29,8 @@
                     item-key="id"
                     class="d-flex flex-wrap justify-content-center gap-2"
                     @end="datosStore.guardarOrden"
+                    :delay="200"
+                    :delay-on-touch-only="true"
                   >
                     <template #item="{ element }">
                       <div class="pagina-item">
@@ -75,6 +81,8 @@
                     item-key="id"
                     class="d-flex flex-wrap justify-content-start  gap-2"
                     @end="datosStore.guardarOrden"
+                    :delay="200"
+                    :delay-on-touch-only="true"
                   >
                     <template #item="{ element }">
                       <div class="pagina-item">
@@ -109,6 +117,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import Header from '@/components/Header.vue'
+import Marcadores from '@/views/Marcadores.vue'
 import draggable from 'vuedraggable'
 import { useDatosStore } from '@/stores/datos'
 import { useDatosModal } from '@/stores/datosmodal'
