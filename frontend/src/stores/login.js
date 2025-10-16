@@ -89,6 +89,10 @@ export const useAuthStore = defineStore('auth', () => {
       isAuthenticated.value = true
       user.value = JSON.parse(storedUser)
       token.value = storedToken
+    } else {
+      isAuthenticated.value = false
+      user.value = null
+      token.value = null
     }
   }
 
